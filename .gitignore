@@ -8,3 +8,11 @@ sim_run_*
 4.2/
 gpucomputingsdk_4.2.9_linux.run
 util/job_launching/*.txt
+
+# large files
+GhOST_SASS_traces*
+gpu-accel-sim-docker.img
+
+# result files
+*.out
+*.err
