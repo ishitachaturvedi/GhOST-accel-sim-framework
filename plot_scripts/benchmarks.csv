@@ -1,0 +1,29 @@
+Benchmark                     , Suite   , Short
+slurm-ispass-BFS.out          , ISPASS  , IBFS
+slurm-LPS.out                 , ISPASS  , LPS
+slurm-LIB.out                 , ISPASS  , LIB
+slurm-RAY.out                 , ISPASS  , RAY
+slurm-STO.out                 , ISPASS  , STO
+slurm-beamformer.out          , PAGODA  , BFM
+slurm-convolution.out         , PAGODA  , CNV
+slurm-dct.out                 , PAGODA  , DCT
+slurm-des_pagoda.out          , PAGODA  , DES
+slurm-mandelbort.out          , PAGODA  , MND
+slurm-matrixMul_pagoda.out    , PAGODA  , MTM
+slurm-multiwork.out           , PAGODA  , MWK
+slurm-fw.out                  , PANNOTIA, FW
+slurm-sssp_pannotia.out       , PANNOTIA, SSSP
+slurm-backprop.out            , RODINIA , BAK
+slurm-bfs_rodinia.out         , RODINIA , RBF
+slurm-b+tree_rodinia.out      , RODINIA , B+T
+slurm-dwt2d_rodinia.out       , RODINIA , DWT
+slurm-gaussian.out            , RODINIA , GAS
+slurm-lavaMD_rodinia.out      , RODINIA , LAV
+slurm-lud.out                 , RODINIA , LUD
+slurm-myocyte.out             , RODINIA , MYO
+slurm-nn.out                  , RODINIA , NN
+slurm-particlefinder_float.out, RODINIA , PFF
+slurm-srad_v1_rodinia.out     , RODINIA , SRA
+slurm-CN.out                  , TANGO   , CN
+slurm-GRU.out                 , TANGO   , GRU
+slurm-LSTM.out                , TANGO   , LSTM

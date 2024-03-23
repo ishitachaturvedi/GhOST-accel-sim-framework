@@ -8,7 +8,7 @@ from functools import lru_cache
 @lru_cache(maxsize=2048) # speed up file reading by caching the results
 def get_values(filepath, params=("total_cycles", "sched_stalls", "occupancy")):
     params_dict = {
-        "total_cycles": {"name": "TOTAL CYCLES", "lambda": lambda line: float(line[3])},
+        "total_cycles": {"name": "gpu_tot_sim_cycle", "lambda": lambda line: float(line[2])},
         "sched_stalls": {"name": "STALLING_VALUES", "lambda": lambda line: int(line[1])},
         "occupancy": {"name": "gpu_tot_occupancy", "lambda": lambda line: float(line[2][:-1])},
     }
@@ -73,7 +73,7 @@ def get_speedup_numbers(csv_writer, all_folders, benchmarks, directory, params=(
                     base_value = param_funcs[param]["func"](directory / testset[0] / filename)
                     import_value = param_funcs[param]["func"](directory / foldername / filename)
                     all_data[filename].append(param_funcs[param]["parse"](import_value, base_value))
-                    print(f"[{column_index}] -- {foldername} / {filename} : {param} = {import_value} by {base_value}")
+                    print(f"[Column {column_index}] -- {foldername} / {filename} : {param} = {import_value} by {base_value}")
                     if import_value == -1:
                         print(f"\033[31mError: {directory}/{foldername}/{filename} does not have {param} value\033[0m")
                     if all_data[filename][-1] > 0:
@@ -236,5 +236,6 @@ if __name__ == "__main__":
     for k, v in fig_table.items():
         print(f"Running {k} to {outfile_folder / f'{k}.csv'}")
         v(directory / "collect_results_artifact", output_file=outfile_folder / f"{k}.csv")
+        print("\n")
         
     
