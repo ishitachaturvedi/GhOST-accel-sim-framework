@@ -16,3 +16,5 @@ gpu-accel-sim-docker.img
 # result files
 *.out
 *.err
+*.bak
+results
