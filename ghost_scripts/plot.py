@@ -4,12 +4,11 @@ import matplotlib
 import numpy as np
 from pathlib import Path
 import pandas as pd
+import argparse
 
 plt.rcParams['font.style'] = 'normal'
 plt.rcParams['font.family'] = 'serif'  # Use a generic family
 font = {'family': 'Times New Roman', 'color':  'black', 'weight': 'normal', 'size': 20}
-print(matplotlib.get_cachedir())
-# exit(0)
 
 def read_csv(csv_file) -> pd.DataFrame:
     """Read a CSV file and return a DataFrame."""
@@ -133,7 +132,6 @@ def plot_fig_13(bm: BenchmarkManager, directory : Path, input_file: Path):
 
     # Assuming the BenchmarkManager class is defined as before and includes the get_benchmark_all method
 
-    # Load the perfectOOO.csv file
     fig_13_csv = read_csv(input_file)
 
     # Prepare the data for plotting
@@ -477,7 +475,6 @@ def plot_fig_17(bm: BenchmarkManager, directory : Path, input_file: Path):
     output_pdf = directory / (input_file.stem + '.pdf')
     output_png = directory / (input_file.stem + '.png')
     
-    # Load the perfectOOO.csv file
     ghostloogoccup_df = read_csv(input_file)
 
     # Prepare the data for plotting
@@ -616,7 +613,6 @@ def plot_fig_19(bm: BenchmarkManager, directory : Path, input_file: Path):
 
     output_pdf = directory / (input_file.stem + '.pdf')
     output_png = directory / (input_file.stem + '.png')
-    # Load the perfectOOO.csv file
     ghostloogoccup_df = read_csv(input_file)
 
     # Prepare the data for plotting
@@ -730,8 +726,88 @@ def plot_fig_19(bm: BenchmarkManager, directory : Path, input_file: Path):
     plt.savefig(output_pdf, bbox_inches='tight')
     plt.savefig(output_png)
 
+def plot_example(bm: BenchmarkManager, directory : Path, input_file: Path):
+    output_pdf = directory / (input_file.stem + '.pdf')
+    output_png = directory / (input_file.stem + '.png')
+    
+    fig_ex_csv = read_csv(input_file)
+    # Prepare the data for plotting
+    plot_data = []
+    for _, row in fig_ex_csv.iterrows():
+        benchmark = row['Benchmark']
+        values = [float(x) for x in list(row)[1:]]
+        for i, v in enumerate(values):
+            if v == 2:
+                values[i] = 0
+                print(f"Found 2: {benchmark} {i} {v}")
+        if is_geo(benchmark):
+            short_name = "GEO"
+        else:
+            try:
+                short_name = bm.benchmark_to_short(benchmark)
+            except KeyError:
+                print(f"KeyError: {benchmark}")
+                continue
+        plot_data.append((short_name, values))
+    plot_names = []
+    for name in list(fig_ex_csv.columns)[1:]:
+        name = name.replace("_OoO", "")
+        name = name.replace("OOO", "")
+        plot_names.append(name)
+    
+    matplotlib.rcParams.update(matplotlib.rcParamsDefault)
+    fig = plt.figure(figsize=(20, 5))
+    plt.rc("font", family="Times New Roman")
+    ax_len = len(plot_data)
+    ax = fig.add_subplot(1,1,1)
+    
+    ending = 0.25
+    sep = 0.2
+    wid = (1 - ending * 2 - sep * (ax_len - 1)) / ax_len
+    
+    for i, v in enumerate(plot_data):
+        bars = ax.bar(np.array(range(len(v[1]))) - (0.5 - ending) + (wid + sep) * 0 + wid / 2, np.array(v[1]) - 1, wid , color=get_color(i + 1), label = v[0], bottom=1)
+
+    # Add suite names below the x-axis
+    ax.set_xticks(ticks=range(len(plot_names)))
+    ax.set_xticklabels(plot_names, rotation=75, ha='center', fontsize=18)
+    ax.set_xlim(-0.5, len(plot_names) - 0.5)
+    
+    top = 1.2
+    bottom = 1.0
+    # Adding labels and title
+    # ax.yticks(fontsize=20)
+    ax.set_ylabel('Speedup', size=20)
+    ax.tick_params(axis='y', labelsize=20)
+    ax.set_ylim(bottom, top)
+    ax.grid(axis='y')
+
+    fig.legend(
+        ncol=3,
+        bbox_to_anchor=[0.92, 0.86],
+        loc='upper right',
+        prop={"size": 20},
+        borderaxespad=0.1,
+        labelspacing=0.25,
+        handlelength=0.75,
+        handletextpad=0.25,
+        borderpad=0.15,
+    )
+    
+    # Show the plot
+    plt.tight_layout()
+    print(f"Saving plot to {output_pdf} and {output_png}")
+    plt.savefig(output_pdf, bbox_inches='tight')
+    plt.savefig(output_png, bbox_inches='tight')
+    
+    
 
 if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser(description='Process data.')
+    parser.add_argument('-p', '--file_prefix', type=str, default="", help='The file prefix')
+    parser.add_argument('-d', '--data_set', type=str, default="all", help='The output datasets (select from fig_3, fig_13, fig_14, fig_15, fig_16, fig_17, fig_19, example), separate by ",", default=all except "example")')
+    args = parser.parse_args()
     
     data_csv = {
         "fig_3": "fig_3.csv",
@@ -741,6 +817,7 @@ if __name__ == "__main__":
         "fig_16": "fig_16.csv",
         "fig_17": "fig_17.csv",
         "fig_19": "fig_19.csv",
+        "example": "example.csv",
     }
     
     plot_funcs = {
@@ -750,7 +827,8 @@ if __name__ == "__main__":
         "fig_15": plot_fig_15,
         "fig_16": plot_fig_16,
         "fig_17": plot_fig_17,
-        "fig_19": plot_fig_19
+        "fig_19": plot_fig_19,
+        "example": plot_example,
     }
     
     directory = Path(__file__).parent
@@ -764,7 +842,18 @@ if __name__ == "__main__":
     bm = BenchmarkManager(benchmark_csv)
     
     print("Current directory: ", directory, ", output folder: ", outfile_folder)
-    for name, file in data_csv.items():
+    
+    if args.data_set == "all":
+        args.data_set = ",".join(list(data_csv.keys())[:-1])
+    
+    output_data_sets = args.data_set.split(",")
+    for k in output_data_sets:
+        if k not in data_csv:
+            print(f"Error: {k} is not a valid dataset.")
+            exit(1)
+
+    for name in output_data_sets:
+        file = args.file_prefix + data_csv[name]
         print(f"Running {name} with {outfile_folder / file}")
         plot_funcs[name](bm, outfile_folder, input_file=outfile_folder / file)
         print("\n")

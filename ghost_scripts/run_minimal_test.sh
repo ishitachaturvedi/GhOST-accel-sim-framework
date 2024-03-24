@@ -28,10 +28,12 @@ echo "Found \$ACCEL_SIM_DIR = $ACCEL_SIM_DIR "
 echo "Found \$SASS_dir = $SASS_dir "
 echo "Found \$SINGULARITY_IMG = $SINGULARITY_IMG "
 
+declare -A all_job_ids  # Associative array to hold all job IDs categorized by build config
 run_tests() {
     local build_config=$1
     shift
     local configs=("$@")
+    local job_ids=()  # Array to store job IDs
 
     export BUILD_CONFIG=$build_config
 
@@ -42,13 +44,21 @@ run_tests() {
             if [ "$DRY_RUN" == "true" ]; then
                 echo "DRY RUN: (cd collect_results_artifact/$config && sbatch LSTM.slurm)"
             else
-                (cd "collect_results_artifact/$config" && sbatch LSTM.slurm)
+                # Run sbatch and capture the output
+                sbatch_output=$(cd "collect_results_artifact/$config" && sbatch LSTM.slurm)
+                echo "$sbatch_output"
+                # Extract the job ID and store it
+                job_id=$(echo $sbatch_output | grep -oP 'Submitted batch job \K[0-9]+')
+                job_ids+=($job_id)
             fi
         else
             echo "Directory collect_results_artifact/$config does not exist" >&2
         fi
     done
-    sleep 5s
+    # Store all job IDs for this batch
+    all_job_ids[$build_config]="${job_ids[*]}"
+
+    sleep 1s
 }
 
 # In order tests
@@ -74,7 +84,34 @@ export LOOG_DIR=$ACCEL_SIM_DIR/gpu-simulator-LOOG/bin/release
 export LOOG_LIBCUDA=$ACCEL_SIM_DIR/gpu-simulator-LOOG/lib/release
 if [ -d "$LOOG_DIR" ] && [ -d "$LOOG_LIBCUDA" ]; then
     loog_configs=("LOOG_OoO")
-    run_tests "" "${loog_configs[@]}"
+    run_tests "LOOG_OoO" "${loog_configs[@]}"
 else
     echo "LOOG directories not found, skipping LOOG tests" >&2
 fi
+
+# At the end of the script, print all job IDs:
+echo -e "\n\nAll tests submitted. Job IDs: "
+SHORT_SCRIPT_DIR=$(basename $SCRIPT_DIR)
+JOB_IDS_FILE="$SHORT_SCRIPT_DIR/min_job_ids.out"
+rm -f "$JOB_IDS_FILE"  # Clear the file if it already exists
+
+for config in "${!all_job_ids[@]}"; do
+    echo "$config: ${all_job_ids[$config]}"
+    echo -n "${all_job_ids[$config]} " >> "$JOB_IDS_FILE"
+done
+
+
+# and prompt here to tell user, what happened.
+# there could be task (e.g. bash "`dirname $SHORT_SCRIPT_DIR`/run_plot.sh") 
+# so please generate a script to run that (print and let user decide)
+echo -e "\n\nAll job IDs stored in $JOB_IDS_FILE"
+
+barrier_job_output=$("$SHORT_SCRIPT_DIR/run_barrier_job.sh" "$JOB_IDS_FILE")
+BARRIER_JOB_ID=$(echo "$barrier_job_output" | grep -oP 'Barrier job submitted with ID: \K[0-9]+')
+echo -e "\n\nA barrier job has been created to track for completeness of all jobs => Job ID: $BARRIER_JOB_ID"
+
+echo -e "\n[NEXT STEP] To wait for all the previous jobs to finish (and success) and then run another script, you can use command:"
+echo "> while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SHORT_SCRIPT_DIR/run_minimal_plot.sh'"
+
+echo "or if you want to execute the previous bash at background, run the following command:"
+echo "> nohup bash -c \"while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SHORT_SCRIPT_DIR/run_minimal_plot.sh'\" & "

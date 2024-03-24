@@ -1,6 +1,6 @@
 from pathlib import Path
 from os import chdir, getcwd
-import csv
+import csv, re
 from functools import lru_cache
 import argparse
 
@@ -136,8 +136,7 @@ def get_load_distribution(benchmark,configs,directory, output_file):
                 for k in range(len(PC_vals_temp[0])):
                     csv_writer.writerow([k] + [PC_vals_temp[i][k] for i in range(len(PCs))])
 
-def get_all_benchmarks():
-    return [
+collect_benchmarks = [
         "slurm-backprop.out", "slurm-bfs_rodinia.out", "slurm-b+tree_rodinia.out", "slurm-dwt2d_rodinia.out",
         "slurm-gaussian.out", "slurm-lavaMD_rodinia.out", "slurm-lud.out", "slurm-myocyte.out", "slurm-nn.out",
         "slurm-particlefinder_float.out", "slurm-srad_v1_rodinia.out", "slurm-beamformer.out",
@@ -146,15 +145,50 @@ def get_all_benchmarks():
         "slurm-ispass-BFS.out", "slurm-LPS.out", "slurm-LIB.out", "slurm-RAY.out", "slurm-STO.out", "slurm-CN.out",
         "slurm-GRU.out", "slurm-LSTM.out"
     ]
+
+def get_all_benchmarks():
+    """Return the list of all available benchmarks."""
+    global collect_benchmarks
+    
+    return collect_benchmarks
+
+def set_benchmarks(benchmarks):
+    """Set the list of benchmarks based on a string of benchmark names separated by commas or semicolons."""
+    global collect_benchmarks
+    if benchmarks.lower() == "all":
+        return
+    
+    benchmarks = [b.strip() for b in re.split('[,;]+', benchmarks)]
+    actual_bmarks = []
+    not_found = []  # List to keep track of benchmarks that were not found
+    for bmark in benchmarks:
+        full_bmark = bmark
+        full_bmark = full_bmark if full_bmark.startswith("slurm-") else "slurm-" + full_bmark
+        full_bmark = full_bmark if full_bmark.endswith(".out") else full_bmark + ".out"
+        if full_bmark in collect_benchmarks:
+            actual_bmarks.append(full_bmark)
+        else:
+            not_found.append(bmark)
+    collect_benchmarks = actual_bmarks
+    if not_found:
+        print(f"These benchmarks were not found: {', '.join(not_found)}")
+
 # Main function definition
 def fig_3(directory, output_file="fig_3.csv"):
     benchmark = ["slurm-sssp_pannotia.out"]
+    required_benchmarks = get_all_benchmarks()
+    # Update the benchmark list to include only those that are also in the required_benchmarks
+    benchmark = list(set(benchmark) & set(required_benchmarks))
+    if not benchmark:
+        print("No required benchmarks are available.")
+        return  # Exit the function if no benchmarks are available
     configs = ["SASS_load_latency"]
     get_load_distribution(benchmark,configs,directory, output_file)
 
 def fig_13(directory, output_file="fig_13.csv"):
     configs = [["IN_4", "IBOOO_8"]]
     benchmarks = get_all_benchmarks()
+    print(benchmarks)
 
     with open(output_file, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
@@ -174,6 +208,7 @@ def fig_15(directory, output_file="fig_15.csv"):
     configs_2060s = ["IN_4", "IBOOO_4", "IBOOO_8", "IBOOO_16", "IBOOO_32",]
     configs_2070 = ["IN_4_RTX3070","IBOOO_4_RTX3070", "IBOOO_8_RTX3070", "IBOOO_16_RTX3070","IBOOO_32_RTX3070",]
     benchmarks = get_all_benchmarks()
+    benchmarks.remove("slurm-myocyte.out") # NOTE: This benchmark is not available in 2070
 
     with open(output_file, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
@@ -198,6 +233,7 @@ def fig_17(directory, output_file="fig_17.csv"):
     configs_ghost = ["IN_4", "IBOOO_8"]
     configs_loog = ["IN_4", "LOOG_OoO"]
     benchmarks = get_all_benchmarks()
+    benchmarks.remove("slurm-LIB.out") # NOTE: This benchmark is not available in LOOG_OoO
     
     with open(output_file, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
@@ -209,6 +245,7 @@ def fig_19(directory, output_file="fig_19.csv"):
     configs_ghost = ["IN_4", "IBOOO_8"]
     configs_loog = ["IN_4", "LOOG_OoO"]
     benchmarks = get_all_benchmarks()
+    benchmarks.remove("slurm-LIB.out") # NOTE: This benchmark is not available in LOOG_OoO
     
     with open(output_file, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
@@ -217,19 +254,28 @@ def fig_19(directory, output_file="fig_19.csv"):
         get_speedup_numbers(csv_writer, configs, benchmarks, directory, params=("total_cycles", ), geo=True)
 
 
-def example(output_file="example.csv"):
-    all_folders = [["IN_4", "IBOOO_4", "IBOOO_8", "IBOOO_16", "IBOOO_32", "GP_4", "GP_8", "GP_16", "GP_32"]]
+def example(directory, output_file="example.csv"):
+    all_folders = [["IN_4", "IBOOO_4", "IBOOO_8", "IBOOO_16", "IBOOO_32",
+                    "GP_4", "GP_8", "GP_16", "GP_32",
+                    "IBOOO_8_SRR", "IBOOO_8_LRR",
+                    "LOOG_OoO"],
+                   ["IN_4_RTX3070", "IBOOO_4_RTX3070", "IBOOO_8_RTX3070", "IBOOO_16_RTX3070", "IBOOO_32_RTX3070", ]]
     benchmarks = get_all_benchmarks()
 
     with open(output_file, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        write_csv_header(csv_writer, all_folders, param_names=(lambda x: x, lambda x: f"{x}_sched"))
-        get_speedup_numbers(csv_writer, all_folders, benchmarks, directory, params=("total_cycles", "sched_stalls"))
+        write_csv_header(csv_writer, all_folders, param_names=(lambda x: x,))
+        get_speedup_numbers(csv_writer, all_folders, benchmarks, directory, params=("total_cycles",))
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process data paths.')
+    parser = argparse.ArgumentParser(description='Process data.')
     parser.add_argument('-p', '--path', type=str, default="collect_results_artifact", help='The test folder to parse data, relative to $ACCEL_SIM_DIR')
+    parser.add_argument('-b', '--benchmarks', type=str, default="all", help='The benchmarks to gather data, separate by ",", default=all')
+    parser.add_argument('-o', '--output_prefix', type=str, default="", help='The output file prefix')
+    parser.add_argument('-d', '--data_set', type=str, default="all", help='The output datasets (select from fig_3, fig_13, fig_14, fig_15, fig_16, fig_17, fig_19, example), separate by ",", default=all except "example")')
     args = parser.parse_args()
+    
+    set_benchmarks(args.benchmarks)
 
     directory = Path(__file__).parent
     if (str(directory).split("/")[-1] == "ghost_scripts"):
@@ -247,11 +293,23 @@ if __name__ == "__main__":
         "fig_15": fig_15,
         "fig_16": fig_16,
         "fig_17": fig_17,
-        "fig_19": fig_19
+        "fig_19": fig_19,
+        "example": example,
     }
-    for k, v in fig_table.items():
-        print(f"Running {k} to {outfile_folder / f'{k}.csv'}")
-        v(directory / args.path, output_file=outfile_folder / f"{k}.csv")
+    
+    if args.data_set == "all":
+        args.data_set = ",".join(list(fig_table.keys())[:-1])
+        
+    output_data_sets = args.data_set.split(",")
+    for k in output_data_sets:
+        if k not in fig_table:
+            print(f"Error: {k} is not a valid dataset.")
+            exit(1)
+    
+    for k in output_data_sets:
+        v = fig_table[k]
+        print(f"Running {k} to {outfile_folder / f'{args.output_prefix}{k}.csv'}")
+        v(directory / args.path, output_file=outfile_folder / f'{args.output_prefix}{k}.csv')
         print("\n")
         
     
