@@ -234,6 +234,7 @@ def fig_17(directory, output_file="fig_17.csv"):
     configs_loog = ["IN_4", "LOOG_OoO"]
     benchmarks = get_all_benchmarks()
     benchmarks.remove("slurm-LIB.out") # NOTE: This benchmark is not available in LOOG_OoO
+    benchmarks.remove("slurm-multiwork.out") # NOTE: This benchmark is not available in LOOG_OoO
     
     with open(output_file, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
@@ -246,6 +247,7 @@ def fig_19(directory, output_file="fig_19.csv"):
     configs_loog = ["IN_4", "LOOG_OoO"]
     benchmarks = get_all_benchmarks()
     benchmarks.remove("slurm-LIB.out") # NOTE: This benchmark is not available in LOOG_OoO
+    benchmarks.remove("slurm-multiwork.out") # NOTE: This benchmark is not available in LOOG_OoO
     
     with open(output_file, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
