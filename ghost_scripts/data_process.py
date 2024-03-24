@@ -216,7 +216,7 @@ def example(output_file="example.csv"):
 
 if __name__ == "__main__":
     directory = Path(__file__).parent
-    if (str(directory).split("/")[-1] == "plot_scripts"):
+    if (str(directory).split("/")[-1] == "ghost_scripts"):
         directory = directory.parent
         
     print("Current directory: ", directory)

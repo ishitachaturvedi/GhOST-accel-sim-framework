@@ -736,13 +736,13 @@ if __name__ == "__main__":
     }
     
     directory = Path(__file__).parent
-    if (str(directory).split("/")[-1] == "plot_scripts"):
+    if (str(directory).split("/")[-1] == "ghost_scripts"):
         directory = directory.parent
     outfile_folder = directory / "results"
     outfile_folder.mkdir(exist_ok=True)
     
     # Examatplotlibe usage:
-    benchmark_csv = directory / "plot_scripts" / 'benchmarks.csv'
+    benchmark_csv = directory / "ghost_scripts" / 'benchmarks.csv'
     bm = BenchmarkManager(benchmark_csv)
     
     print("Current directory: ", directory, ", output folder: ", outfile_folder)
