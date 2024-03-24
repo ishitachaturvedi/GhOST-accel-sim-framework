@@ -1,0 +1,1 @@
+time $ACCEL_SIM_DIR/gpu-simulator/bin/release$BUILD_CONFIG/accel-sim.out -trace $SASS_dir/particlefilter_float-rodinia-3.1/_x_128__y_128__z_10__np_1000/traces/kernelslist.g -config gpgpusim.config -config $ACCEL_SIM_DIR/gpu-simulator/configs/tested-cfgs/SM75_RTX2060_S/trace.config

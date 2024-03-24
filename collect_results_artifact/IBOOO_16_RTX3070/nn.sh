@@ -1,0 +1,1 @@
+time $ACCEL_SIM_DIR/gpu-simulator/bin/release$BUILD_CONFIG/accel-sim.out -trace $SASS_dir/nn-rodinia-3.1/__data_filelist_4__r_5__lat_30__lng_90/traces/kernelslist.g -config gpgpusim.config -config $ACCEL_SIM_DIR/gpu-simulator/configs/tested-cfgs/SM86_RTX3070/trace.config
