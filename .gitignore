@@ -11,9 +11,12 @@ util/job_launching/*.txt
 
 # large files
 GhOST_SASS_traces*
+GhOST-area-calculation*
 gpu-accel-sim-docker.img
 gpu-simulator-LOOG
 get_results
+*.tar
+*.tar.gz
 
 # result files
 *.out

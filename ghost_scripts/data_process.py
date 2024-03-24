@@ -2,6 +2,7 @@ from pathlib import Path
 from os import chdir, getcwd
 import csv
 from functools import lru_cache
+import argparse
 
 
 # Definition of necessary functions for statistical analysis
@@ -41,16 +42,27 @@ def get_scheduler_stalls(filepath):
 def get_occupancy(filepath):
     return get_values(filepath)[2]
 
-def write_csv_header(csv_writer, all_folders, param_names=(lambda x: x, lambda x: f"{x}_sched"), name_rule=(lambda x:x)):
-    headers = ["Benchmark"] + [f"{name(name_rule(foldername))}" for test_set in all_folders for foldername in test_set[1:] for name in param_names]
+def write_csv_header(csv_writer, all_folders, 
+                     param_names=(lambda x: x, lambda x: f"{x}_sched"), name_rule=(lambda x:x)):
+    headers = (["Benchmark"] + 
+               [f"{name(name_rule(foldername))}" 
+                for test_set in all_folders 
+                for foldername in test_set[1:] 
+                for name in param_names])
     csv_writer.writerow(headers)
 
-def get_speedup_numbers(csv_writer, all_folders, benchmarks, directory, params=("total_cycles", "sched_stalls", "occupancy"), 
+def get_speedup_numbers(csv_writer, all_folders, benchmarks, directory, 
+                        params=("total_cycles", "sched_stalls", "occupancy"), 
                         geo=False, geo_only=False):
     param_funcs = {
-        "total_cycles": {"func": get_total_cycles, "parse": lambda v, base: (base - v) / base + 1 if base > 0 else 0},
-        "sched_stalls": {"func": get_scheduler_stalls, "parse": lambda v, base: (base - v) / base + 1 if base > 0 else 0},
-        "occupancy": {"func": get_occupancy, "parse": lambda v, _: v if v > 0 else 0}
+        # "total_cycles": {"func": get_total_cycles, "parse": lambda v, base: (base - v) / base + 1 if base > 0 else 0},
+        "total_cycles": {"func": get_total_cycles, 
+                         "parse": lambda v, base: (base) / v if v > 0 else 0},
+        # "sched_stalls": {"func": get_scheduler_stalls, "parse": lambda v, base: (base - v) / base + 1 if base > 0 else 0},
+        "sched_stalls": {"func": get_scheduler_stalls, 
+                         "parse": lambda v, base: (base) / v if v > 0 else 0},
+        "occupancy": {"func": get_occupancy, 
+                      "parse": lambda v, _: v if v > 0 else 0}
     }
     
     geo = geo or geo_only
@@ -215,6 +227,10 @@ def example(output_file="example.csv"):
         get_speedup_numbers(csv_writer, all_folders, benchmarks, directory, params=("total_cycles", "sched_stalls"))
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process data paths.')
+    parser.add_argument('-p', '--path', type=str, default="collect_results_artifact", help='The test folder to parse data, relative to $ACCEL_SIM_DIR')
+    args = parser.parse_args()
+
     directory = Path(__file__).parent
     if (str(directory).split("/")[-1] == "ghost_scripts"):
         directory = directory.parent
@@ -235,7 +251,7 @@ if __name__ == "__main__":
     }
     for k, v in fig_table.items():
         print(f"Running {k} to {outfile_folder / f'{k}.csv'}")
-        v(directory / "collect_results_artifact", output_file=outfile_folder / f"{k}.csv")
+        v(directory / args.path, output_file=outfile_folder / f"{k}.csv")
         print("\n")
         
     

@@ -196,18 +196,26 @@ def plot_fig_13(bm: BenchmarkManager, directory : Path, input_file: Path):
             current_suite = suite
             begin_idx = idx
 
+    top = 1.2
+    bottom = 1.0
+    labelled_speedup_indices = set()
     for (idx, v) in enumerate(list(zip(*values))[0]):
-        if v > 1.2:
+        if v > top:
+            labelled_speedup_indices.add(idx)
             ax.text((idx - 0.7), 1.195, f"{v:.2f}", ha='center', va='top', 
                     fontsize=16, color="green")
 
     for (idx, v) in enumerate(list(zip(*values))[2]):
-        if v > 1.2:
-            ay.text((idx + 0.5), 19.5, f"{100 * (v -1):.0f}%", ha='center', va='top', 
-                    fontsize=16, color="brown")
+        if v > top:
+            if idx not in labelled_speedup_indices:
+                ay.text((idx - 0.5), 19.5, f"{100 * (v - 1):.0f}%", ha='center', va='top', 
+                        fontsize=16, color="brown")
+            else:
+                ay.text((idx + 0.5), 19.5, f"{100 * (v - 1):.0f}%", ha='center', va='top', 
+                        fontsize=16, color="brown")
 
     for (idx, v) in enumerate(list(zip(*values))[1]):
-        if v > 20:
+        if v > (top - 1) * 100:
             if idx != len(values) - 1:
                 ay.text((idx + 0.70), 19.5, f"{v:.0f}%", ha='center', va='top', 
                         fontsize=16, color="darkblue")
@@ -218,7 +226,7 @@ def plot_fig_13(bm: BenchmarkManager, directory : Path, input_file: Path):
     # ax.yticks(fontsize=20)
     ax.set_ylabel('Speedup', size=20)
     ax.tick_params(axis='y', labelsize=20)
-    ax.set_ylim(1, 1.2)
+    ax.set_ylim(bottom, top)
     ax.grid(axis='y')
 
     ay.set_ylim(0, 2)
@@ -227,7 +235,7 @@ def plot_fig_13(bm: BenchmarkManager, directory : Path, input_file: Path):
     ay.set_yticks([0, 10, 20])
     fig.legend(
         ncol=3,
-        bbox_to_anchor=[0.94, 0.86],
+        bbox_to_anchor=[0.92, 0.86],
         loc='upper right',
         prop={"size": 20},
         borderaxespad=0.1,
@@ -300,15 +308,26 @@ def plot_fig_14(bm: BenchmarkManager, directory : Path, input_file: Path):
     for idx, (short, _, suite) in enumerate(plot_data):
         if suite != current_suite:
             plt.axvline(x=idx - 0.5, color='gray', linestyle='--')
-            plt.gca().text((begin_idx + idx - 1) / 2, 0.7, f"{current_suite}", ha='center', va='center', 
+            plt.gca().text((begin_idx + idx - 1) / 2, 0.62, f"{current_suite}", ha='center', va='center', 
                         fontsize=18)
             current_suite = suite
             begin_idx = idx
+    
+    
+    top = 1.4
+    bottom = 0.85
+    text_sep = 0.6
+    text_colors = ["#122364", "#0a5420", "#4a044a", "#553f20"]
+    for i, v in enumerate(values):
+        for k, kv in enumerate(v):
+            if kv > top:
+                plt.text((i - (len(v) * text_sep) + (k * text_sep) + text_sep * 2.5), 1.4575, f"{kv:.2f}", ha='center', va='top', 
+                        fontsize=16, color=text_colors[k])
 
     # Adding labels and title
     plt.yticks(fontsize=20)
     plt.ylabel('Speedup', size=20)
-    plt.ylim(0.88, 1.4)
+    plt.ylim(bottom, top)
     plt.grid(axis='y')
 
     plt.legend(
@@ -481,7 +500,7 @@ def plot_fig_17(bm: BenchmarkManager, directory : Path, input_file: Path):
         if is_geo(benchmark):
             short_name = "GEO"
             suite_name = "~GEO"
-            # plot_data_geo.append((short_name, values, suite_name))
+            plot_data_geo.append((short_name, values, suite_name))
         else:
             try:
                 short_name = bm.benchmark_to_short(benchmark)
@@ -493,10 +512,6 @@ def plot_fig_17(bm: BenchmarkManager, directory : Path, input_file: Path):
 
     # recalculate the GEOMEAN
     _, values, __ = zip(*plot_data)
-    (ghost_values, loog_values) = zip(*values)
-    geo_ghost = np.prod(ghost_values) ** (1 / len(ghost_values))
-    geo_loog = np.prod(loog_values) ** (1 / len(loog_values))
-    plot_data_geo.append(("GEO", (geo_ghost, geo_loog), "~GEO"))
 
     # Sort plot data by suite name for better grouping in the plot
     plot_data.sort(key=lambda x: x[2])
@@ -544,27 +559,33 @@ def plot_fig_17(bm: BenchmarkManager, directory : Path, input_file: Path):
                         fontsize=18)  
     ax.axvline(x=idx + 0.5, color='gray', linestyle='--')
 
-    ghost_color = "green"
-    loog_color = "#432251"
+    ghost_color = "#103210"
+    loog_color = "#43031f"
 
+    below_bottom_last = False
     for (idx, v) in enumerate(list((plot_values))[0]):
         if v > top:
-            ax.text((idx + 0.69), 1.29, f"{v:.2f}", ha='center', va='top', 
+            ax.text((idx + 0.88), 1.29, f"{v:.2f}", ha='center', va='top', 
                     fontsize=16, color=ghost_color)
+        below_bottom_last_n = False
         if v < bottom:
-            ax.text((idx + 0.08), 0.67, f"{v:.2f}", ha='center', va='top', 
-                    fontsize=16, color=ghost_color)
+            ax.text((idx + (0.28 if below_bottom_last else -0.1)), 0.68, f"{v:.2f}", ha='center', va='top', 
+                    fontsize=15, color=ghost_color)
+            below_bottom_last_n = True
+        below_bottom_last = below_bottom_last_n
             
+    below_bottom_last = False
     for (idx, v) in enumerate(list((plot_values))[1]):
         idx += len(plot_values[0])
         if v > top:
-            ax.text((idx + 0.69), 1.29, f"{v:.2f}", ha='center', va='top', 
+            ax.text((idx + 0.88), 1.29, f"{v:.2f}", ha='center', va='top', 
                     fontsize=16, color=loog_color)
+        below_bottom_last_n = False
         if v < bottom:
-            ax.text((idx + 0.08), 0.67, f"{v:.2f}", ha='center', va='top', 
-                    fontsize=16, color=loog_color)
-
-
+            ax.text((idx + (0.28 if below_bottom_last else -0.1)), 0.68, f"{v:.2f}", ha='center', va='top', 
+                    fontsize=15, color=loog_color)
+            below_bottom_last_n = True
+        below_bottom_last = below_bottom_last_n
 
     # Adding labels and title
     plt.yticks(fontsize=20)
@@ -634,10 +655,6 @@ def plot_fig_19(bm: BenchmarkManager, directory : Path, input_file: Path):
 
     # recalculate the GEOMEAN
     _, values, __ = zip(*plot_data)
-    (ghost_values, loog_values) = zip(*values)
-    geo_ghost = np.prod(ghost_values) ** (1 / len(ghost_values))
-    geo_loog = np.prod(loog_values) ** (1 / len(loog_values))
-    geo_values = [geo_ghost, geo_loog]
 
     # Sort plot data by suite name for better grouping in the plot
     plot_data.sort(key=lambda x: x[2])
@@ -678,12 +695,13 @@ def plot_fig_19(bm: BenchmarkManager, directory : Path, input_file: Path):
     ending = 0.2
     sep = 0.1
     wid = (1 - ending * 2 - sep * (ay_len - 1)) / ay_len
-    top = 1.5
+    top = 1.8
+    bottom = 0.2
     plot_values = list(zip(min_values, max_values, geo_values))
     for i, v in enumerate(plot_values):
         bars = ay.bar(np.array(range(len(v))) - (0.5 - ending) + (wid + sep) * i + wid / 2, np.array(v) - 1, wid , color=get_color(i + 1), label = ("GhOST", "LOOG")[i], bottom=1)
         for j, value in enumerate(v):
-            ay.text(j - (0.5 - ending) + (wid + sep) * i + wid / 2, min(top + 0.05, value + 0.05) if value > 1 else value - 0.06, f"{value:.2f}", ha='center', va='center', color=get_text_color(i + 1),
+            ay.text(j - (0.5 - ending) + (wid + sep) * i + wid / 2, min(top + 0.05, value + 0.05) if value > 1 else value - 0.072, f"{value:.2f}", ha='center', va='center', color=get_text_color(i + 1),
                     fontsize=fontsize + 1)
 
     ay.set_xticks([0, 1, 2])
@@ -691,13 +709,13 @@ def plot_fig_19(bm: BenchmarkManager, directory : Path, input_file: Path):
     ay.tick_params(axis='x', labelsize=fontsize)
     ay.tick_params(axis='y', labelsize=fontsize)
     ay.set_ylabel('Speedup', size=fontsize)
-    ay.set_ylim(0.2, top)
+    ay.set_ylim(bottom, top)
     ay.grid(axis='both')
     ay.axhline(y=1.0, color='black', linestyle='-', linewidth=1)
 
     fig.legend(
         ncol=2,
-        bbox_to_anchor=[0.77, 0.19],
+        bbox_to_anchor=[0.85, 0.24],
         loc='center',
         prop={"size": fontsize},
         borderaxespad=0.1,
