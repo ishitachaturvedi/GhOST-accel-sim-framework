@@ -15,7 +15,7 @@ wget "http://dl.dropboxusercontent.com/scl/fi/mojmdrllvv04ybbdnjp8n/GhOST_SASS_t
 tar -xzf GhOST_SASS_traces.tar.gz & 
 
 # load area calculation [zenode link]
-wget "http://dl.dropboxusercontent.com/scl/fi/zar2q8xjvzr8rl0g1vdwm/GhOST-area-calculation.tar.gz?rlkey=ttz1tta6xyph8nrv9nal2wrx9&dl=0" -O GhOST-area-calculation.tar.gz
+wget "http://dl.dropboxusercontent.com/scl/fi/hbrthlutldyvyge2u205v/GhOST-area-calculation.tar.gz?rlkey=e6kli4ojfeqkeuytysy6ybc0f&dl=0" -O GhOST-area-calculation.tar.gz
 tar -xzf GhOST-area-calculation.tar.gz &
 
 # load image file [zenode link]
