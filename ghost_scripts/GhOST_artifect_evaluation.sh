@@ -16,5 +16,5 @@ export ACCEL_SIM_DIR=${ACCEL_SIM_DIR:-$(pwd)}
 echo "Executing run_test.sh"
 bash $SCRIPT_DIR/run_test.sh
 
-echo "Executing run_are.sh"
+echo "Executing run_area.sh"
 bash $SCRIPT_DIR/run_area.sh
