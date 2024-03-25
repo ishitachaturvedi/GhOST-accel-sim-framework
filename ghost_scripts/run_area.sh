@@ -5,8 +5,11 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cd "$SCRIPT_DIR/.." || exit
 echo "Current working dir is $(pwd)"
 
+# attemp to set $ACCEL_SIM_DIR if possible
+export ACCEL_SIM_DIR=${ACCEL_SIM_DIR:-$(pwd)}
 # test environment
 [ ! -d "$ACCEL_SIM_DIR/ghost_scripts" ] && echo "Error: Directory $ACCEL_SIM_DIR/ghost_scripts does not exist" > /dev/stderr
+
 export CUDA_INSTALL_PATH=/usr/local/cuda-11
 export PATH=$CUDA_INSTALL_PATH/bin:$CUDA_INSTALL_PATH/targets/x86_64-linux/lib:$PATH
 export SASS_dir=${SASS_dir:-$ACCEL_SIM_DIR/GhOST_SASS_traces}

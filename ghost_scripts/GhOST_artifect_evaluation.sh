@@ -10,10 +10,11 @@ export ACCEL_SIM_DIR=${ACCEL_SIM_DIR:-$(pwd)}
 # test environment
 [ ! -d "$ACCEL_SIM_DIR/ghost_scripts" ] && echo "Error: Directory $ACCEL_SIM_DIR/ghost_scripts does not exist" > /dev/stderr
 
-### Parse data and plot performance diagrams
-echo "WARNING: Please install required python3 lib (or pip here) if not installed"
-echo "Execute: pip3 install --user -r $ACCEL_SIM_DIR/ghost_scripts/requirements.txt  # to install required python3 lib (or pip here)"
+# Check directories and files exist
+[[ ! -d "$ACCEL_SIM_DIR" ]] && echo "ERROR: \$ACCEL_SIM_DIR not found" >&2 && exit 1
 
-set -x
-python $ACCEL_SIM_DIR/ghost_scripts/data_process.py
-python $ACCEL_SIM_DIR/ghost_scripts/plot.py
+echo "Executing run_test.sh"
+bash $SCRIPT_DIR/run_test.sh
+
+echo "Executing run_are.sh"
+bash $SCRIPT_DIR/run_area.sh
