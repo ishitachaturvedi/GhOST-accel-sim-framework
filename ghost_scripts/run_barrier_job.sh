@@ -30,9 +30,7 @@ done"
 
 # Submit a barrier job that checks the completion status of other jobs
 if [ -n "$JOB_IDS" ]; then
-    set -x
     BARRIER_JOB_ID=$(sbatch --dependency=afterany:$JOB_IDS --time=2:00 --wrap="$check_script" | cut -d ' ' -f 4)
-    { set +x; } 2>/dev/null
     echo "Barrier job submitted with ID: $BARRIER_JOB_ID"
 else
     echo "No job IDs provided. Exiting."
