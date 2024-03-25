@@ -15,7 +15,7 @@ wget "http://dl.dropboxusercontent.com/scl/fi/mojmdrllvv04ybbdnjp8n/GhOST_SASS_t
 tar -xzf GhOST_SASS_traces.tar.gz & 
 
 # load area calculation [zenode link]
-wget "http://dl.dropboxusercontent.com/scl/fi/9o2fm51h6qjjzfd02y8z6/GhOST-area-calculation.tar.gz?rlkey=gmj8p81jup7wjd7oh4ml004c5&dl=0" -O GhOST-area-calculation.tar.gz
+wget "http://dl.dropboxusercontent.com/scl/fi/hfo493qfdsb09hupd9nra/GhOST-area-calculation.tar.gz?rlkey=j4el3rh6mr10s84zgh7ngfuqe&dl=0" -O GhOST-area-calculation.tar.gz
 tar -xzf GhOST-area-calculation.tar.gz &
 
 # load image file [zenode link]
@@ -25,13 +25,13 @@ wget "http://dl.dropboxusercontent.com/scl/fi/w39fuxejxja1y8f8ciog8/gpu-accel-si
 echo "Wait for all background jobs to finish ..." >&2
 wait
 
-# TOTAL FOLDER SIZE AT THIS MOMENT: about 65GB
+# TOTAL FOLDER SIZE AT THIS MOMENT: about 46GB
 
 ### for build
 echo "Running build script" >&2
 bash ghost_scripts/run_build.sh
 
-echo "Running minimal test" >&2
 ## have a minimal test for the setup
+echo "Running minimal test" >&2
 bash ghost_scripts/run_minimal_test.sh
 

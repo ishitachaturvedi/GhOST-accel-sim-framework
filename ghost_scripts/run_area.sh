@@ -40,4 +40,7 @@ echo "Found \$SYNOPSYS_PATH = $SYNOPSYS_PATH "
 echo "Found \$SYNOPSYS_ICC2_PATH = $SYNOPSYS_ICC2_PATH "
 
 # Area and Power model
+echo "Start all runs at $area_base"
+echo "Running collect_area_stats.sh"
+mkdir -p $area_base/results
 (cd $area_base && bash collect_area_stats.sh)
