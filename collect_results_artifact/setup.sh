@@ -35,4 +35,3 @@ echo "Running minimal test" >&2
 ## have a minimal test for the setup
 bash ghost_scripts/run_minimal_test.sh
 
-echo "All done" >&2

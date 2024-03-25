@@ -44,7 +44,11 @@ run_tests() {
             if [ "$DRY_RUN" == "true" ]; then
                 echo "DRY RUN: (cd collect_results_artifact/$config && bash run_all_scripts_ISCA.sh)"
             else
-                (cd "collect_results_artifact/$config" && bash run_all_scripts_ISCA.sh)
+                sbatch_output=$(cd "collect_results_artifact/$config" && bash run_all_scripts_ISCA.sh)
+                echo "$sbatch_output"
+                # Extract the job ID and store it
+                job_id=$(echo $sbatch_output | grep -oP 'Submitted batch job \K[0-9]+')
+                job_ids+=($job_id)
             fi
         else
             echo "Directory collect_results_artifact/$config does not exist" >&2
@@ -96,17 +100,30 @@ for config in "${!all_job_ids[@]}"; do
 done
 
 
+# Next steps
+# Check if we are in a terminal
+if [ -t 1 ]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[0;33m'
+    NO_COLOR='\033[0m'
+else
+    RED=''
+    GREEN=''
+    YELLOW=''
+    NO_COLOR=''
+fi
+
 # and prompt here to tell user, what happened.
-# there could be task (e.g. bash "`dirname $SHORT_SCRIPT_DIR`/run_plot.sh") 
-# so please generate a script to run that (print and let user decide)
-echo -e "\n\nAll job IDs stored in $JOB_IDS_FILE"
+echo -e "\nAll job IDs stored in $JOB_IDS_FILE"
 
-barrier_job_output=$("$SHORT_SCRIPT_DIR/run_barrier_job.sh" "$JOB_IDS_FILE")
+barrier_job_output=$("$SCRIPT_DIR/run_barrier_job.sh" "$JOB_IDS_FILE")
 BARRIER_JOB_ID=$(echo "$barrier_job_output" | grep -oP 'Barrier job submitted with ID: \K[0-9]+')
-echo -e "\n\nA barrier job has been created to track for completeness of all jobs => Job ID: $BARRIER_JOB_ID"
+echo -e "\nA barrier job has been created to track the completeness of all jobs => Job ID: $BARRIER_JOB_ID${NO_COLOR}"
+echo -e "You may use '${GREEN}squeue -j $BARRIER_JOB_ID${NO_COLOR}' to check the status of the barrier job."
 
-echo -e "\n[NEXT STEP] To wait for all the previous jobs to finish (and success) and then run another script, you can use command:"
-echo "> while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SHORT_SCRIPT_DIR/run_plot.sh'"
+# Provide hint for next steps.
+echo -e "\n${YELLOW}After all jobs are completed, the script to plot the results will automatically start in the background.${NO_COLOR}"
+# Run a plot script
+nohup bash -c "while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SCRIPT_DIR/run_plot.sh'" &> /dev/null &
 
-echo "or if you want to execute the previous bash at background, run the following command:"
-echo "> nohup bash -c \"while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SHORT_SCRIPT_DIR/run_plot.sh'\" & "

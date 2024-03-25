@@ -73,10 +73,6 @@ ooo_configs=("IBOOO_16" "IBOOO_32_RTX3070" "IBOOO_64_BP_RMI_RR" "IBOOO_8_RTX3070
             "IBOOO_32" "IBOOO_4_RTX3070" "IBOOO_8_LRR")
 run_tests "-ooo" "${ooo_configs[@]}"
 
-# Latency tests
-# latency_configs=("SASS_load_latency")
-# run_tests "-ldlat" "${latency_configs[@]}"
-
 # GP tests
 gp_configs=("GP_16" "GP_32" "GP_4" "GP_8")
 run_tests "-gp" "${gp_configs[@]}"
@@ -93,8 +89,7 @@ fi
 
 # At the end of the script, print all job IDs:
 echo -e "\n\nAll tests submitted. Job IDs: "
-SHORT_SCRIPT_DIR=$(basename $SCRIPT_DIR)
-JOB_IDS_FILE="$SHORT_SCRIPT_DIR/min_job_ids.out"
+JOB_IDS_FILE="$SCRIPT_DIR/min_job_ids.out"
 rm -f "$JOB_IDS_FILE"  # Clear the file if it already exists
 
 for config in "${!all_job_ids[@]}"; do
@@ -102,18 +97,39 @@ for config in "${!all_job_ids[@]}"; do
     echo -n "${all_job_ids[$config]} " >> "$JOB_IDS_FILE"
 done
 
+# Next steps
+# Check if we are in a terminal
+if [ -t 1 ]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[0;33m'
+    NO_COLOR='\033[0m'
+else
+    RED=''
+    GREEN=''
+    YELLOW=''
+    NO_COLOR=''
+fi
 
-# and prompt here to tell user, what happened.
-# there could be task (e.g. bash "`dirname $SHORT_SCRIPT_DIR`/run_plot.sh") 
-# so please generate a script to run that (print and let user decide)
-echo -e "\n\nAll job IDs stored in $JOB_IDS_FILE"
+# Notify the user about the storage of job IDs.
+echo -e "\nAll job IDs stored in $JOB_IDS_FILE"
 
-barrier_job_output=$("$SHORT_SCRIPT_DIR/run_barrier_job.sh" "$JOB_IDS_FILE")
+barrier_job_output=$("$SCRIPT_DIR/run_barrier_job.sh" "$JOB_IDS_FILE")
 BARRIER_JOB_ID=$(echo "$barrier_job_output" | grep -oP 'Barrier job submitted with ID: \K[0-9]+')
-echo -e "\n\nA barrier job has been created to track for completeness of all jobs => Job ID: $BARRIER_JOB_ID"
+echo -e "\nA barrier job has been created to track the completeness of all jobs => Job ID: $BARRIER_JOB_ID${NO_COLOR}"
+echo -e "You may use '${GREEN}squeue -j $BARRIER_JOB_ID${NO_COLOR}' to check the status of the barrier job."
 
-echo -e "\n[NEXT STEP] To wait for all the previous jobs to finish (and success) and then run another script, you can use command:"
-echo "> while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SHORT_SCRIPT_DIR/run_minimal_plot.sh'"
+# Provide hint for next steps.
+echo -e "\n${YELLOW}After all jobs are completed, the script to plot the results will automatically start in the background.${NO_COLOR}"
+# Run a minimal plot script
+nohup bash -c "while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SCRIPT_DIR/run_minimal_plot.sh'" &> /dev/null &
 
-echo "or if you want to execute the previous bash at background, run the following command:"
-echo "> nohup bash -c \"while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SHORT_SCRIPT_DIR/run_minimal_plot.sh'\" & "
+# Inform the user about the expected duration and next steps.
+echo "The minimal test and plotting will typically take less than 10 minutes to finish."
+echo -e "\n"
+echo -e "${GREEN}[NEXT STEP]${NO_COLOR} Please verify that the plot matches expected results:"
+echo -e "  Compare  $ACCEL_SIM_DIR/results/min_example.png  with  $ACCEL_SIM_DIR/gold_files/min_example.png"
+echo -e "  If the files match, proceed with the full analysis by running:"
+echo -e "    $    ${GREEN}bash '$SCRIPT_DIR/run_test.sh'${NO_COLOR}"
+echo -e "  And perform area/power analysis with:"
+echo -e "    $    ${GREEN}bash '$SCRIPT_DIR/run_area.sh'${NO_COLOR}"

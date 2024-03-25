@@ -7,7 +7,6 @@ FILES=" backprop.slurm
         gaussian.slurm
         lavaMD_rodinia.slurm
         lud.slurm
-        myocyte.slurm
         nn.slurm
         particlefinder_float.slurm
         srad_v1_rodinia.slurm

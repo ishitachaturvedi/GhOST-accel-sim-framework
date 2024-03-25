@@ -16,12 +16,10 @@ FILES=" backprop.slurm
         des_pagoda.slurm
         mandelbort.slurm
         matrixMul_pagoda.slurm
-        multiwork.slurm
         fw.slurm
         sssp_pannotia.slurm
         ispass-BFS.slurm
         LPS.slurm
-        LIB.slurm
         RAY.slurm
         STO.slurm
         CN.slurm
