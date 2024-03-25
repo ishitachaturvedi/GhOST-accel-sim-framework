@@ -6,9 +6,17 @@ from pathlib import Path
 import pandas as pd
 import argparse
 
-plt.rcParams['font.style'] = 'normal'
-plt.rcParams['font.family'] = 'serif'  # Use a generic family
-font = {'family': 'Times New Roman', 'color':  'black', 'weight': 'normal', 'size': 20}
+# attempt to load "Times New Roman" from local folder
+font_path = Path(__file__).parent / 'Times New Roman.ttf'
+assert(font_path.is_file())
+matplotlib.font_manager.fontManager.addfont(font_path)
+custom_font = matplotlib.font_manager.FontProperties(fname=font_path).get_name()
+
+font = {'family': custom_font, 'color':  'black', 'weight': 'normal', 'size': 20}
+
+def reset_font():
+    plt.rcParams['font.family'] = custom_font
+    plt.rcParams['font.style'] = 'normal'
 
 def read_csv(csv_file) -> pd.DataFrame:
     """Read a CSV file and return a DataFrame."""
@@ -106,6 +114,7 @@ def plot_fig_3(bm: BenchmarkManager, directory : Path, input_file: Path):
     val = df.astype(int).to_dict(orient='list')
 
     line_styles = ['-', '--', '-.', ':', (0, (3, 5, 1, 5)), (0, (5, 10))]
+    reset_font()
 
     plt.hist(val["1440"], bins=100,alpha = 1, linestyle=line_styles[0], color="orange", histtype='step',label="1")
     plt.hist(val["976"], bins=100,alpha = 1, linestyle=line_styles[1], color="green", histtype='step',label="2")
@@ -161,9 +170,8 @@ def plot_fig_13(bm: BenchmarkManager, directory : Path, input_file: Path):
 
     # Separate data into components for plotting
     short_names, values, suite_names = zip(*plot_data)
-    matplotlib.rcParams.update(matplotlib.rcParamsDefault)
     fig = plt.figure(figsize=(20, 3.6))
-    plt.rc("font", family="Times New Roman")
+    reset_font()
     ax_len = 3
     ax = fig.add_subplot(1,1,1)
     ay = ax.twinx()
@@ -286,7 +294,7 @@ def plot_fig_14(bm: BenchmarkManager, directory : Path, input_file: Path):
     short_names, values, suite_names = zip(*plot_data)
     # Plotting
     plt.figure(figsize=(20, 3.6))
-    plt.rc("font", family="Times New Roman")
+    reset_font()
     ax_len = len(values[0])
     ending = 0.1
     sep = 0.04
@@ -364,7 +372,7 @@ def plot_fig_15(bm: BenchmarkManager, directory : Path, input_file: Path):
 
     # Plotting
     plt.figure(figsize=(10, 2.4))
-    plt.rc("font", family="Times New Roman")
+    reset_font()
     ax_len = len(values[0])
     ending = 0.2
     sep = 0.025
@@ -425,7 +433,7 @@ def plot_fig_16(bm: BenchmarkManager, directory : Path, input_file: Path):
     # Plotting
     ax_len = 3
     plt.figure(figsize=(10, 2.4))
-    plt.rc("font", family="Times New Roman")
+    reset_font()
     ending = 0.24
     sep = 0.05
     wid = (1 - ending * 2 - sep * (ax_len - 1)) / ax_len
@@ -515,7 +523,7 @@ def plot_fig_17(bm: BenchmarkManager, directory : Path, input_file: Path):
     short_names, values, suite_names = zip(*plot_data)
     # Plotting
     fig = plt.figure(figsize=(20, 4.25))
-    plt.rc("font", family="Times New Roman")
+    reset_font()
     ax_len = len(values[0])
     ax = fig.add_subplot(1,1,1)
     # ay = ax.twinx()
@@ -661,7 +669,7 @@ def plot_fig_19(bm: BenchmarkManager, directory : Path, input_file: Path):
 
     # Plotting
     fig = plt.figure(figsize=(16, 6))
-    plt.rc("font", family="Times New Roman")
+    reset_font()
     ax_len = len(values[0])
     ax = fig.add_subplot(1,2,1)
     ay = fig.add_subplot(1,2,2)
@@ -755,7 +763,6 @@ def plot_example(bm: BenchmarkManager, directory : Path, input_file: Path):
         name = name.replace("OOO", "")
         plot_names.append(name)
     
-    matplotlib.rcParams.update(matplotlib.rcParamsDefault)
     fig = plt.figure(figsize=(20, 5))
     plt.rc("font", family="Times New Roman")
     ax_len = len(plot_data)
