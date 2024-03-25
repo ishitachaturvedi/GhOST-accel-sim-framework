@@ -28,6 +28,8 @@ echo "Found \$ACCEL_SIM_DIR = $ACCEL_SIM_DIR "
 echo "Found \$SASS_dir = $SASS_dir "
 echo "Found \$SINGULARITY_IMG = $SINGULARITY_IMG "
 
+collect_results_artifact_dir="collect_results_artifact"
+
 declare -A all_job_ids  # Associative array to hold all job IDs categorized by build config
 run_tests() {
     local build_config=$1
@@ -38,21 +40,21 @@ run_tests() {
     export BUILD_CONFIG=$build_config
 
     for config in "${configs[@]}"; do
-        echo "Start all runs at ./collect_results_artifact/$config"
+        echo "Start all runs at ./$collect_results_artifact_dir/$config"
         # Ensure the directory exists before attempting to enter and execute
-        if [ -d "collect_results_artifact/$config" ]; then
+        if [ -d "$collect_results_artifact_dir/$config" ]; then
             if [ "$DRY_RUN" == "true" ]; then
-                echo "DRY RUN: (cd collect_results_artifact/$config && sbatch LSTM.slurm)"
+                echo "DRY RUN: (cd $collect_results_artifact_dir/$config && sbatch LSTM.slurm)"
             else
                 # Run sbatch and capture the output
-                sbatch_output=$(cd "collect_results_artifact/$config" && sbatch LSTM.slurm)
+                sbatch_output=$(cd "$collect_results_artifact_dir/$config" && sbatch LSTM.slurm)
                 echo "$sbatch_output"
                 # Extract the job ID and store it
                 job_id=$(echo $sbatch_output | grep -oP 'Submitted batch job \K[0-9]+')
                 job_ids+=($job_id)
             fi
         else
-            echo "Directory collect_results_artifact/$config does not exist" >&2
+            echo "Directory $collect_results_artifact_dir/$config does not exist" >&2
         fi
     done
     # Store all job IDs for this batch

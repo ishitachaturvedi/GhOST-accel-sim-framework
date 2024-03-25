@@ -559,29 +559,29 @@ def plot_fig_17(bm: BenchmarkManager, directory : Path, input_file: Path):
     ghost_color = "#103210"
     loog_color = "#43031f"
 
-    below_bottom_last = False
+    below_bottom_last = 0
     for (idx, v) in enumerate(list((plot_values))[0]):
         if v > top:
             ax.text((idx + 0.88), 1.29, f"{v:.2f}", ha='center', va='top', 
                     fontsize=16, color=ghost_color)
-        below_bottom_last_n = False
+        below_bottom_last_n = 0
         if v < bottom:
-            ax.text((idx + (0.28 if below_bottom_last else -0.1)), 0.68, f"{v:.2f}", ha='center', va='top', 
+            ax.text((idx + (-0.2 + below_bottom_last * 0.2)), 0.68, f"{v:.2f}", ha='center', va='top', 
                     fontsize=15, color=ghost_color)
-            below_bottom_last_n = True
+            below_bottom_last_n = below_bottom_last + 1
         below_bottom_last = below_bottom_last_n
             
-    below_bottom_last = False
+    below_bottom_last = 0
     for (idx, v) in enumerate(list((plot_values))[1]):
         idx += len(plot_values[0])
         if v > top:
             ax.text((idx + 0.88), 1.29, f"{v:.2f}", ha='center', va='top', 
                     fontsize=16, color=loog_color)
-        below_bottom_last_n = False
+        below_bottom_last_n = 0
         if v < bottom:
-            ax.text((idx + (0.28 if below_bottom_last else -0.1)), 0.68, f"{v:.2f}", ha='center', va='top', 
+            ax.text((idx + (-0.2 + below_bottom_last * 0.2)), 0.68, f"{v:.2f}", ha='center', va='top', 
                     fontsize=15, color=loog_color)
-            below_bottom_last_n = True
+            below_bottom_last_n = below_bottom_last + 1
         below_bottom_last = below_bottom_last_n
 
     # Adding labels and title

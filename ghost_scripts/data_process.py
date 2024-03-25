@@ -150,7 +150,7 @@ def get_all_benchmarks():
     """Return the list of all available benchmarks."""
     global collect_benchmarks
     
-    return collect_benchmarks
+    return list(collect_benchmarks)
 
 def set_benchmarks(benchmarks):
     """Set the list of benchmarks based on a string of benchmark names separated by commas or semicolons."""
