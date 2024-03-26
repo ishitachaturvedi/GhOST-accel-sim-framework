@@ -1,6 +1,6 @@
 # get git folder
 # wget "https://zenodo.org/records/10847246/files/GhOST-accel-sim-framework-dev.zip?download=1&preview=1" -O GhOST-accel-sim-framework.tar.gz
-wget "https://zenodo.org/records/10874181/files/GhOST-accel-sim-framework-dev.tar.gz?download=1" -O GhOST-accel-sim-framework.tar.gz
+wget "https://zenodo.org/records/10874714/files/GhOST-accel-sim-framework.tar.gz?download=1" -O GhOST-accel-sim-framework.tar.gz
 tar -xzf GhOST-accel-sim-framework.tar.gz
 cd GhOST-accel-sim-framework
 
@@ -21,7 +21,8 @@ wget "https://zenodo.org/records/10874181/files/GhOST-area-calculation.tar.gz?do
 tar -xzf GhOST-area-calculation.tar.gz &
 
 # load image file [zenode link]
-wget "https://zenodo.org/records/10874181/files/gpu-accel-sim-docker.img?download=1" -O gpu-accel-sim-docker.img &
+wget "https://zenodo.org/records/10874714/files/gpu-accel-sim-docker.img.tar.gz?download=1" -O gpu-accel-sim-docker.img.tar.gz &
+tar -xzf gpu-accel-sim-docker.img.tar.gz &
 
 # Wait for all background jobs to finish
 echo "Wait for all background jobs to finish ..." >&2
