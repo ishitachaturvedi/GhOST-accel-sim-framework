@@ -13,11 +13,11 @@ export ACCEL_SIM_DIR=`pwd`
 tar -xzf gpu-simulator-LOOG.tar.gz &
 
 # load SASS traces [zenode link]
-wget "https://zenodo.org/records/10874181/files/GhOST_SASS_traces.tar.gz?download=1" -O GhOST_SASS_traces.tar.gz
+wget "https://zenodo.org/records/10874714/files/GhOST_SASS_traces.tar.gz?download=1" -O GhOST_SASS_traces.tar.gz
 tar -xzf GhOST_SASS_traces.tar.gz & 
 
 # load area calculation [zenode link]
-wget "https://zenodo.org/records/10874181/files/GhOST-area-calculation.tar.gz?download=1" -O GhOST-area-calculation.tar.gz
+wget "https://zenodo.org/records/10874714/files/GhOST-area-calculation.tar.gz?download=1" -O GhOST-area-calculation.tar.gz
 tar -xzf GhOST-area-calculation.tar.gz &
 
 # load image file [zenode link]
