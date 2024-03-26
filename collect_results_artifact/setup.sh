@@ -1,5 +1,6 @@
 # get git folder
-wget "https://zenodo.org/records/10847246/files/GhOST-accel-sim-framework-dev.zip?download=1&preview=1" -O GhOST-accel-sim-framework.tar.gz
+# wget "https://zenodo.org/records/10847246/files/GhOST-accel-sim-framework-dev.zip?download=1&preview=1" -O GhOST-accel-sim-framework.tar.gz
+wget "https://zenodo.org/records/10874181/files/GhOST-accel-sim-framework-dev.tar.gz?download=1" -O GhOST-accel-sim-framework.tar.gz
 tar -xzf GhOST-accel-sim-framework.tar.gz
 cd GhOST-accel-sim-framework
 
@@ -12,15 +13,15 @@ export ACCEL_SIM_DIR=`pwd`
 tar -xzf gpu-simulator-LOOG.tar.gz &
 
 # load SASS traces [zenode link]
-wget "https://zenodo.org/records/10847246/files/GhOST_SASS_traces.tar.gz?download=1&preview=1" -O GhOST_SASS_traces.tar.gz
+wget "https://zenodo.org/records/10874181/files/GhOST_SASS_traces.tar.gz?download=1" -O GhOST_SASS_traces.tar.gz
 tar -xzf GhOST_SASS_traces.tar.gz & 
 
 # load area calculation [zenode link]
-wget "https://zenodo.org/records/10847246/files/GhOST-area-calculation.tar.gz?download=1&preview=1" -O GhOST-area-calculation.tar.gz
+wget "https://zenodo.org/records/10874181/files/GhOST-area-calculation.tar.gz?download=1" -O GhOST-area-calculation.tar.gz
 tar -xzf GhOST-area-calculation.tar.gz &
 
 # load image file [zenode link]
-wget "https://zenodo.org/records/10847246/files/gpu-accel-sim-docker.img?download=1&preview=1" -O gpu-accel-sim-docker.img &
+wget "https://zenodo.org/records/10874181/files/gpu-accel-sim-docker.img?download=1" -O gpu-accel-sim-docker.img &
 
 # Wait for all background jobs to finish
 echo "Wait for all background jobs to finish ..." >&2
