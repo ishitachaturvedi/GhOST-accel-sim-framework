@@ -771,7 +771,6 @@ def plot_example(bm: BenchmarkManager, directory : Path, input_file: Path):
     ending = 0.25
     sep = 0.2
     wid = (1 - ending * 2 - sep * (ax_len - 1)) / ax_len
-    
     for i, v in enumerate(plot_data):
         bars = ax.bar(np.array(range(len(v[1]))) - (0.5 - ending) + (wid + sep) * 0 + wid / 2, np.array(v[1]) - 1, wid , color=get_color(i + 1), label = v[0], bottom=1)
 
@@ -861,7 +860,7 @@ if __name__ == "__main__":
 
     for name in output_data_sets:
         file = args.file_prefix + data_csv[name]
-        print(f"Running {name} with {outfile_folder / file}")
+        print(f"Running {name} plot with {outfile_folder / file}")
         plot_funcs[name](bm, outfile_folder, input_file=outfile_folder / file)
         print("\n")
 

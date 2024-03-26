@@ -126,6 +126,8 @@ echo -e "You may use '${GREEN}squeue -j $BARRIER_JOB_ID${NO_COLOR}' to check the
 
 # Provide hint for next steps.
 echo -e "\n${YELLOW}After all jobs are completed, the script to plot the results will automatically start in the background.${NO_COLOR}"
+echo -e "\nSubmitting the plot job to be executed after the barrier job completes..."
+sbatch --dependency=afterany:$BARRIER_JOB_ID $SCRIPT_DIR/run_plot.slurm
 # Run a plot script
-nohup bash -c "while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SCRIPT_DIR/run_plot.sh'" &> /dev/null &
+# nohup bash -c "while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SCRIPT_DIR/run_plot.sh'" &> /dev/null &
 

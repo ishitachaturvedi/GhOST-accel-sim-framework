@@ -12,9 +12,8 @@ export ACCEL_SIM_DIR=${ACCEL_SIM_DIR:-$(pwd)}
 
 ### Parse data and plot performance diagrams
 echo "WARNING: Please install required python3 lib (or pip here) if not installed"
-echo "Execute: pip3 install --user -r $ACCEL_SIM_DIR/ghost_scripts/requirements.txt  # to install required python3 lib (or pip here)"
+echo "Execute: $   pip3 install --user -r $ACCEL_SIM_DIR/ghost_scripts/requirements.txt  # to install required python3 lib (or pip here)"
 
 set -x
-pip3 install --user -r $ACCEL_SIM_DIR/ghost_scripts/requirements.txt
 python $ACCEL_SIM_DIR/ghost_scripts/data_process.py -o min_ -b LSTM -d example
 python $ACCEL_SIM_DIR/ghost_scripts/plot.py -p min_ -d example

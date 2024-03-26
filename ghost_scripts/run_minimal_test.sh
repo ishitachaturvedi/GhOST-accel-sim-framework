@@ -123,8 +123,11 @@ echo -e "You may use '${GREEN}squeue -j $BARRIER_JOB_ID${NO_COLOR}' to check the
 
 # Provide hint for next steps.
 echo -e "\n${YELLOW}After all jobs are completed, the script to plot the results will automatically start in the background.${NO_COLOR}"
+echo -e "\nSubmitting the plot job to be executed after the barrier job completes..."
+sbatch --dependency=afterany:$BARRIER_JOB_ID $SCRIPT_DIR/run_minimal_plot.slurm
+
 # Run a minimal plot script
-nohup bash -c "while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SCRIPT_DIR/run_minimal_plot.sh'" &> /dev/null &
+# nohup bash -c "while squeue -j $BARRIER_JOB_ID | grep -q '$BARRIER_JOB_ID'; do sleep 10; done && bash '$SCRIPT_DIR/run_minimal_plot.sh'" &> /dev/null &
 
 # Inform the user about the expected duration and next steps.
 echo "The minimal test and plotting will typically take less than 10 minutes to finish."
@@ -132,6 +135,9 @@ echo -e "\n"
 echo -e "${GREEN}[NEXT STEP]${NO_COLOR} Please verify that the plot matches expected results:"
 echo -e "  Compare  $ACCEL_SIM_DIR/results/min_example.png  with  $ACCEL_SIM_DIR/gold_files/min_example.png"
 echo -e "  If the files match, proceed with the full analysis by running:"
+echo -e "    $    ${GREEN}bash '$SCRIPT_DIR/GhOST_artifect_evaluation.sh'${NO_COLOR}"
+echo -e "\n"
+echo -e "  Alternatively, execute the performance test with graph generation by running:"
 echo -e "    $    ${GREEN}bash '$SCRIPT_DIR/run_test.sh'${NO_COLOR}"
-echo -e "  And perform area/power analysis with:"
+echo -e "  And execute area/power analysis with:"
 echo -e "    $    ${GREEN}bash '$SCRIPT_DIR/run_area.sh'${NO_COLOR}"
