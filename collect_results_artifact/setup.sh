@@ -21,7 +21,7 @@ wget "https://zenodo.org/records/10874714/files/GhOST-area-calculation.tar.gz?do
 tar -xzf GhOST-area-calculation.tar.gz &
 
 # load image file [zenode link]
-wget "https://zenodo.org/records/10874714/files/gpu-accel-sim-docker.img.tar.gz?download=1" -O gpu-accel-sim-docker.img.tar.gz &
+wget "https://zenodo.org/records/10874714/files/gpu-accel-sim-docker.img.tar.gz?download=1" -O gpu-accel-sim-docker.img.tar.gz
 tar -xzf gpu-accel-sim-docker.img.tar.gz &
 
 # Wait for all background jobs to finish
